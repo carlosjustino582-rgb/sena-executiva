@@ -1,0 +1,635 @@
+[
+  {
+    "id": "decisoes",
+    "cat": "Estratégia",
+    "date": "2026-05-20",
+    "read": 6,
+    "featured": true,
+    "art": "xadrez",
+    "title": "Como tomar decisões estratégicas com mais confiança",
+    "excerpt": "Decisões estratégicas moldam o futuro das empresas. Um processo prático para avaliar cenários, reduzir riscos e decidir com clareza.",
+    "body": [
+      {
+        "t": "p",
+        "v": "Poucas coisas desgastam tanto uma equipa de gestão como uma decisão que fica pendente durante meses. O custo raramente aparece na demonstração de resultados, mas está lá: oportunidades perdidas, equipas paradas à espera de um sinal, concorrentes que avançam enquanto se pede mais um relatório."
+      },
+      {
+        "t": "p",
+        "v": "Decidir bem não é acertar sempre. É ter um processo que permite decidir com a informação disponível, explicar porquê e corrigir depressa quando a realidade contraria a hipótese inicial."
+      },
+      {
+        "t": "h",
+        "v": "Separe as decisões reversíveis das irreversíveis"
+      },
+      {
+        "t": "p",
+        "v": "A maioria das decisões pode ser desfeita a um custo baixo. Essas devem ser rápidas, delegadas e testadas em pequena escala. As restantes — entrar num novo mercado, mudar de modelo de negócio, contratar uma equipa de liderança — merecem análise profunda, cenários e um debate honesto sobre o que teria de ser verdade para a decisão funcionar."
+      },
+      {
+        "t": "q",
+        "v": "Se a decisão pode ser revertida numa semana, não gaste um mês a analisá-la."
+      },
+      {
+        "t": "h",
+        "v": "Escreva a hipótese antes de decidir"
+      },
+      {
+        "t": "p",
+        "v": "Antes de avançar, registe em uma página: o problema, as opções consideradas, a opção escolhida, o que espera que aconteça e quando vai reavaliar. Este documento simples transforma opiniões em hipóteses verificáveis e protege a equipa do enviesamento de quem só se lembra dos acertos."
+      },
+      {
+        "t": "ul",
+        "v": [
+          "Qual é a decisão que estamos realmente a tomar?",
+          "O que teria de ser verdade para esta opção ganhar?",
+          "Que informação mudaria a nossa escolha — e quanto custa obtê-la?",
+          "Quem decide, quem é consultado e quem apenas é informado?",
+          "Quando voltamos a olhar para isto com dados reais?"
+        ]
+      },
+      {
+        "t": "h",
+        "v": "Defina o momento da revisão"
+      },
+      {
+        "t": "p",
+        "v": "Uma decisão sem data de revisão torna-se dogma. Marque desde o início quando é que os pressupostos serão testados face aos números — 30, 60 ou 90 dias — e o que fará se a hipótese não se confirmar. Mudar de rumo com dados não é indecisão; é gestão."
+      },
+      {
+        "t": "p",
+        "v": "Empresas que decidem bem não têm gestores mais inteligentes. Têm um processo mais claro, ciclos de revisão mais curtos e uma cultura onde mudar de opinião com base em evidência é sinal de maturidade."
+      }
+    ]
+  },
+  {
+    "id": "lideres",
+    "cat": "Liderança",
+    "date": "2026-05-18",
+    "read": 4,
+    "art": "rede",
+    "title": "Como desenvolver líderes que inspiram e entregam resultados",
+    "excerpt": "Liderança vai além de cargos. Práticas concretas para desenvolver líderes mais humanos e mais eficazes.",
+    "body": [
+      {
+        "t": "p",
+        "v": "Promover o melhor técnico a chefe continua a ser o erro mais caro e mais repetido nas organizações. Competência técnica e capacidade de liderar pessoas são músculos diferentes — e o segundo raramente é treinado."
+      },
+      {
+        "t": "h",
+        "v": "Clareza antes de motivação"
+      },
+      {
+        "t": "p",
+        "v": "Equipas desmotivadas são, muitas vezes, equipas confusas. Antes de investir em discursos inspiradores, garanta que cada pessoa sabe responder a três perguntas: o que se espera de mim, como é que o meu trabalho é avaliado e como é que contribui para o resultado da empresa."
+      },
+      {
+        "t": "q",
+        "v": "As pessoas não saem de empresas. Saem de relações onde não se sentem vistas."
+      },
+      {
+        "t": "h",
+        "v": "Conversas curtas e frequentes"
+      },
+      {
+        "t": "p",
+        "v": "Uma reunião individual de trinta minutos por quinzena faz mais pela retenção do que uma avaliação anual elaborada. O objetivo não é rever tarefas — é perceber obstáculos, dar feedback específico e ajustar prioridades enquanto ainda é barato ajustar."
+      },
+      {
+        "t": "ul",
+        "v": [
+          "O que te está a bloquear neste momento?",
+          "Que decisão precisas de mim para avançar?",
+          "Que parte do teu trabalho gostavas de fazer mais?"
+        ]
+      },
+      {
+        "t": "p",
+        "v": "Desenvolver líderes é um trabalho de anos, não um workshop. Comece por dar contexto, delegue decisões reais com margem para errar e faça acompanhamento próximo. Autonomia sem apoio é abandono; apoio sem autonomia é microgestão."
+      }
+    ]
+  },
+  {
+    "id": "gestao7",
+    "cat": "Gestão",
+    "date": "2026-05-17",
+    "read": 5,
+    "art": "barras",
+    "title": "Gestão empresarial: 7 práticas para aumentar a eficiência",
+    "excerpt": "Processos bem definidos reduzem desperdícios e aumentam a produtividade da sua equipa.",
+    "body": [
+      {
+        "t": "p",
+        "v": "Eficiência raramente vem de trabalhar mais depressa. Vem de deixar de fazer o que não devia estar a ser feito — e de tornar previsível aquilo que se repete."
+      },
+      {
+        "t": "h",
+        "v": "Comece pelo que se repete"
+      },
+      {
+        "t": "p",
+        "v": "Identifique as cinco tarefas que a sua equipa executa com mais frequência. Documente-as em passos simples, defina quem é responsável e meça quanto tempo demoram hoje. Só depois pense em automatizar: automatizar um processo mau apenas produz erros mais depressa."
+      },
+      {
+        "t": "ul",
+        "v": [
+          "Mapeie o processo tal como acontece, não como devia acontecer",
+          "Elimine aprovações que ninguém consegue justificar",
+          "Defina um responsável único por cada etapa",
+          "Estabeleça prazos-padrão e torne-os visíveis",
+          "Meça o tempo de ciclo antes e depois da mudança",
+          "Reveja o processo de três em três meses",
+          "Peça a quem executa para propor a melhoria seguinte"
+        ]
+      },
+      {
+        "t": "q",
+        "v": "O que não tem dono não tem prazo — e o que não tem prazo não acontece."
+      },
+      {
+        "t": "p",
+        "v": "A eficiência sustentável nasce de ciclos curtos de melhoria conduzidos por quem faz o trabalho. O papel da gestão é remover obstáculos e proteger a equipa de prioridades que mudam todas as semanas."
+      }
+    ]
+  },
+  {
+    "id": "marketing",
+    "cat": "Marketing",
+    "date": "2026-05-16",
+    "read": 6,
+    "art": "aneis",
+    "title": "Marketing estratégico: como gerar valor e atrair clientes ideais",
+    "excerpt": "Descubra como alinhar posicionamento, mensagem e canais para gerar resultados consistentes.",
+    "body": [
+      {
+        "t": "p",
+        "v": "Muita empresa investe em canais antes de resolver a pergunta mais básica: porque é que um cliente deve escolher-nos em vez da alternativa mais óbvia? Sem essa resposta, qualquer orçamento de marketing torna-se caro."
+      },
+      {
+        "t": "h",
+        "v": "Posicionamento é uma escolha, não um slogan"
+      },
+      {
+        "t": "p",
+        "v": "Posicionar-se implica renunciar. Escolher um segmento significa aceitar que outros não são o seu cliente ideal. É desconfortável — e é exatamente por isso que funciona: uma mensagem dirigida a toda a gente não é lembrada por ninguém."
+      },
+      {
+        "t": "h",
+        "v": "Do posicionamento à mensagem"
+      },
+      {
+        "t": "p",
+        "v": "A mensagem eficaz descreve o problema do cliente melhor do que ele próprio o consegue descrever. Comece por escrever, nas palavras do cliente, o que ele está a tentar resolver. Só depois fale das suas soluções."
+      },
+      {
+        "t": "ul",
+        "v": [
+          "Quem é o cliente que ganhamos mais vezes e servimos melhor?",
+          "Que problema resolvemos que dói o suficiente para ser pago?",
+          "Qual é a alternativa real do cliente se não nos contratar?",
+          "Que prova temos de que funciona?"
+        ]
+      },
+      {
+        "t": "p",
+        "v": "Só depois destas respostas vale a pena discutir canais. Canais amplificam a mensagem — não a corrigem."
+      }
+    ]
+  },
+  {
+    "id": "digital",
+    "cat": "Tecnologia",
+    "date": "2026-05-15",
+    "read": 5,
+    "art": "circuito",
+    "title": "Transformação digital: o que realmente importa para o seu negócio",
+    "excerpt": "Mais que tecnologia, é sobre pessoas, processos e uma mentalidade orientada a dados.",
+    "body": [
+      {
+        "t": "p",
+        "v": "Transformação digital falhada tem quase sempre a mesma assinatura: compra-se uma plataforma, forma-se a equipa durante dois dias e espera-se que os resultados apareçam. Seis meses depois, o processo antigo continua a correr em paralelo, agora em folhas de cálculo escondidas."
+      },
+      {
+        "t": "h",
+        "v": "Tecnologia é a última decisão, não a primeira"
+      },
+      {
+        "t": "p",
+        "v": "A sequência que funciona é conhecida: clarificar o resultado de negócio pretendido, redesenhar o processo, definir os dados necessários e só então escolher a ferramenta. Invertê-la é a forma mais rápida de comprar software caro que ninguém usa."
+      },
+      {
+        "t": "q",
+        "v": "Digitalizar um processo confuso não o resolve — apenas torna a confusão mais rápida."
+      },
+      {
+        "t": "h",
+        "v": "Comece por um caso com dono e prazo"
+      },
+      {
+        "t": "p",
+        "v": "Escolha um processo com impacto visível e um responsável claro. Prove o valor em noventa dias, meça, comunique o resultado e use-o para financiar a etapa seguinte. Vitórias pequenas e visíveis criam a confiança que os projetos grandes precisam."
+      },
+      {
+        "t": "p",
+        "v": "No fim, transformação digital é sobretudo uma mudança de hábitos: decidir com dados em vez de intuição, documentar em vez de memorizar, iterar em vez de esperar pela solução perfeita."
+      }
+    ]
+  },
+  {
+    "id": "cultura",
+    "cat": "Cultura",
+    "date": "2026-05-14",
+    "read": 4,
+    "art": "circulos",
+    "title": "Cultura organizacional: o segredo das empresas que crescem",
+    "excerpt": "Uma cultura forte alinha pessoas, propósito e resultados. Veja como construir a sua.",
+    "body": [
+      {
+        "t": "p",
+        "v": "Cultura não é o que está escrito na parede da receção. É o comportamento que a organização tolera, premeia e promove — sobretudo quando ninguém está a ver."
+      },
+      {
+        "t": "h",
+        "v": "Os valores medem-se nas exceções"
+      },
+      {
+        "t": "p",
+        "v": "Qualquer empresa consegue respeitar os seus valores num bom trimestre. A cultura revela-se quando o valor custa dinheiro: o cliente importante que age mal com a equipa, o vendedor de topo que não trabalha com ninguém, o prazo que só se cumpre com um atalho ético."
+      },
+      {
+        "t": "ul",
+        "v": [
+          "Quem foi promovido no último ano — e porquê?",
+          "Que comportamentos toleramos por serem de alguém que entrega números?",
+          "Que histórias são contadas aos novos colaboradores na primeira semana?"
+        ]
+      },
+      {
+        "t": "q",
+        "v": "A cultura de uma empresa é definida pelo pior comportamento que a liderança aceita."
+      },
+      {
+        "t": "p",
+        "v": "Construir cultura é repetir decisões coerentes durante anos. Ganha-se devagar e perde-se depressa — normalmente numa única decisão em que o resultado de curto prazo venceu o princípio declarado."
+      }
+    ]
+  },
+  {
+    "id": "escalar",
+    "cat": "Crescimento",
+    "date": "2026-05-13",
+    "read": 7,
+    "art": "linha",
+    "title": "Crescimento sustentável: estratégias para escalar com inteligência",
+    "excerpt": "Crescer é ótimo. Crescer de forma sustentável é o que garante longevidade.",
+    "body": [
+      {
+        "t": "p",
+        "v": "Crescer depressa é sedutor e perigoso. Muitas empresas não morrem por falta de clientes — morrem por excesso de clientes que não conseguem servir com a estrutura que têm."
+      },
+      {
+        "t": "h",
+        "v": "Escalar é repetir com qualidade"
+      },
+      {
+        "t": "p",
+        "v": "Antes de acelerar as vendas, verifique se consegue entregar o mesmo resultado sem depender das duas ou três pessoas que sabem tudo. Se a qualidade depende de heróis, o crescimento vai degradá-la."
+      },
+      {
+        "t": "ul",
+        "v": [
+          "O nosso processo de entrega funciona sem o fundador?",
+          "Sabemos quanto custa servir cada cliente?",
+          "Temos tesouraria para financiar o crescimento do próximo trimestre?",
+          "Conseguimos integrar uma pessoa nova em menos de um mês?"
+        ]
+      },
+      {
+        "t": "h",
+        "v": "Escolha o constrangimento certo"
+      },
+      {
+        "t": "p",
+        "v": "Em cada fase existe um único constrangimento que limita o crescimento: pode ser a geração de procura, a capacidade de entrega, a tesouraria ou a liderança intermédia. Investir em tudo ao mesmo tempo dilui recursos. Identifique o constrangimento, resolva-o, e passe ao seguinte."
+      },
+      {
+        "t": "p",
+        "v": "Crescimento sustentável mede-se por margem, retenção e qualidade da operação — não apenas por faturação."
+      }
+    ]
+  },
+  {
+    "id": "ia",
+    "cat": "Inovação",
+    "date": "2026-05-12",
+    "read": 6,
+    "art": "pontos",
+    "trend": true,
+    "title": "Inteligência Artificial: oportunidades e riscos para empresas",
+    "excerpt": "Onde a IA cria valor real, onde ainda não cria, e como avaliar sem cair no exagero.",
+    "body": [
+      {
+        "t": "p",
+        "v": "Poucas tecnologias geraram tanta pressão de adoção em tão pouco tempo. O risco maior, hoje, não é ficar para trás — é investir em projetos vistosos que não resolvem nenhum problema de negócio."
+      },
+      {
+        "t": "h",
+        "v": "Comece pelas tarefas, não pelas funções"
+      },
+      {
+        "t": "p",
+        "v": "A unidade de análise útil é a tarefa: redigir uma proposta, resumir uma reunião, classificar pedidos de clientes. Liste as tarefas frequentes, repetitivas e baseadas em texto ou dados, e avalie caso a caso onde a assistência automática poupa tempo com qualidade aceitável."
+      },
+      {
+        "t": "q",
+        "v": "Um projeto de IA sem métrica de negócio é uma demonstração, não uma iniciativa."
+      },
+      {
+        "t": "h",
+        "v": "Governação desde o primeiro dia"
+      },
+      {
+        "t": "p",
+        "v": "Defina que dados podem ser usados, quem valida os resultados e como se documenta a utilização. Supervisão humana em decisões que afetam pessoas — contratação, crédito, avaliação — não é burocracia: é gestão de risco."
+      },
+      {
+        "t": "p",
+        "v": "As empresas que ganham com esta tecnologia são as que mantêm disciplina: problema claro, métrica definida, piloto curto e decisão honesta sobre continuar ou parar."
+      }
+    ]
+  },
+  {
+    "id": "futuro-trabalho",
+    "cat": "Gestão",
+    "date": "2026-05-11",
+    "read": 5,
+    "art": "barras",
+    "trend": true,
+    "title": "O futuro do trabalho e as novas competências essenciais",
+    "excerpt": "Modelos híbridos, autonomia e as competências que passam a distinguir as equipas.",
+    "body": [
+      {
+        "t": "p",
+        "v": "O debate sobre presencial ou remoto distraiu-nos da pergunta que interessa: que condições é que este trabalho exige para ser bem feito? A resposta muda por função — e obriga a decidir em vez de aplicar uma regra única."
+      },
+      {
+        "t": "h",
+        "v": "Coordenação passou a ser competência técnica"
+      },
+      {
+        "t": "p",
+        "v": "Em equipas distribuídas, escrever bem, documentar decisões e comunicar de forma assíncrona deixaram de ser talentos extra e passaram a ser requisitos básicos. Quem não documenta, bloqueia os outros."
+      },
+      {
+        "t": "ul",
+        "v": [
+          "Clareza escrita e capacidade de sintetizar",
+          "Autonomia com prestação de contas",
+          "Literacia de dados para questionar números",
+          "Capacidade de aprender e desaprender depressa"
+        ]
+      },
+      {
+        "t": "p",
+        "v": "O modelo importa menos do que a clareza sobre resultados esperados. Equipas com objetivos nítidos funcionam em qualquer formato; equipas sem eles falham em todos."
+      }
+    ]
+  },
+  {
+    "id": "esg",
+    "cat": "Estratégia",
+    "date": "2026-05-10",
+    "read": 6,
+    "art": "xadrez",
+    "trend": true,
+    "title": "ESG na prática: como gerar impacto e valor ao mesmo tempo",
+    "excerpt": "Sustentabilidade deixou de ser relatório e passou a ser critério de decisão e acesso a capital.",
+    "body": [
+      {
+        "t": "p",
+        "v": "Durante anos, ESG viveu no departamento de comunicação. Hoje entra nas condições de financiamento, nos concursos públicos e nos requisitos de grandes clientes — e isso muda a conversa."
+      },
+      {
+        "t": "h",
+        "v": "Escolha os temas materiais"
+      },
+      {
+        "t": "p",
+        "v": "Nenhuma empresa consegue trabalhar todos os indicadores. Identifique os três ou quatro temas com impacto real no seu setor e nos seus stakeholders. Para uma empresa logística, será consumo energético e segurança; para uma consultora, talento e governação."
+      },
+      {
+        "t": "q",
+        "v": "Um relatório bonito sem dados fiáveis é um risco reputacional, não um ativo."
+      },
+      {
+        "t": "p",
+        "v": "Meça o que declara, comece pelo que já controla e evolua com honestidade. Credibilidade constrói-se com números verificáveis e metas que a empresa consegue defender."
+      }
+    ]
+  },
+  {
+    "id": "inovacao-aberta",
+    "cat": "Inovação",
+    "date": "2026-05-09",
+    "read": 5,
+    "art": "pontos",
+    "trend": true,
+    "title": "Inovação aberta: colaborar para transformar",
+    "excerpt": "Parcerias com startups, universidades e clientes como motor de novas soluções.",
+    "body": [
+      {
+        "t": "p",
+        "v": "Nenhuma organização tem, dentro de portas, todo o conhecimento de que precisa. A inovação aberta parte desse reconhecimento: procurar fora aquilo que seria lento ou caro construir dentro."
+      },
+      {
+        "t": "h",
+        "v": "Comece com um problema bem formulado"
+      },
+      {
+        "t": "p",
+        "v": "Parcerias fracassam quando o desafio é vago. Em vez de \"queremos inovar\", formule: reduzir em 20% o tempo de resposta a pedidos de clientes, com solução testável em noventa dias. Problemas concretos atraem parceiros certos."
+      },
+      {
+        "t": "ul",
+        "v": [
+          "Defina o problema, o critério de sucesso e o prazo",
+          "Escolha um responsável interno com poder de decisão",
+          "Estabeleça regras de propriedade intelectual à partida",
+          "Trate o piloto como experiência, com hipótese e métrica"
+        ]
+      },
+      {
+        "t": "p",
+        "v": "O maior obstáculo raramente é técnico — é organizacional. Sem um dono interno com autoridade, a melhor parceria morre no processo de compras."
+      }
+    ]
+  },
+  {
+    "id": "empatia",
+    "cat": "Liderança",
+    "date": "2026-05-08",
+    "read": 4,
+    "art": "rede",
+    "pop": 1,
+    "title": "Liderança empática: o poder de ouvir mais",
+    "excerpt": "Ouvir bem é a competência de liderança mais subestimada — e a mais fácil de treinar.",
+    "body": [
+      {
+        "t": "p",
+        "v": "Empatia na liderança não é concordar com tudo nem evitar conversas difíceis. É compreender com precisão a situação da outra pessoa antes de decidir — e depois decidir mesmo assim."
+      },
+      {
+        "t": "h",
+        "v": "Ouvir para compreender, não para responder"
+      },
+      {
+        "t": "p",
+        "v": "A maior parte das chefias ouve enquanto prepara a resposta. Uma técnica simples inverte isso: antes de responder, resuma o que ouviu e pergunte se percebeu bem. O efeito na confiança é imediato e mensurável."
+      },
+      {
+        "t": "q",
+        "v": "Uma pessoa que se sente compreendida aceita muito melhor uma decisão de que não gosta."
+      },
+      {
+        "t": "p",
+        "v": "Empatia não substitui exigência. As melhores equipas combinam elevada exigência com elevado apoio — e é essa combinação, não a simpatia, que produz desempenho sustentado."
+      }
+    ]
+  },
+  {
+    "id": "indicadores",
+    "cat": "Gestão",
+    "date": "2026-05-07",
+    "read": 5,
+    "art": "barras",
+    "pop": 2,
+    "title": "Indicadores que todo o gestor deve acompanhar",
+    "excerpt": "Poucos números, bem escolhidos, valem mais do que um painel com quarenta gráficos.",
+    "body": [
+      {
+        "t": "p",
+        "v": "Painéis sobrecarregados produzem a ilusão de controlo. A pergunta certa não é \"que dados temos?\", mas \"que decisão é que este número vai informar?\"."
+      },
+      {
+        "t": "h",
+        "v": "Três famílias de indicadores"
+      },
+      {
+        "t": "p",
+        "v": "Resultado (margem, tesouraria, retenção) diz onde chegámos. Operação (tempo de ciclo, taxa de erro, capacidade utilizada) explica porquê. Antecedentes (procura qualificada, satisfação, rotatividade) avisa do que aí vem. Um painel útil tem indicadores das três famílias e poucos de cada."
+      },
+      {
+        "t": "ul",
+        "v": [
+          "Cada indicador tem um responsável identificado",
+          "Cada indicador tem um valor de referência",
+          "Se o número piorar, sabemos qual é a ação seguinte"
+        ]
+      },
+      {
+        "t": "p",
+        "v": "Se um indicador não muda nenhuma decisão, retire-o do painel. Atenção da gestão é o recurso mais escasso da empresa."
+      }
+    ]
+  },
+  {
+    "id": "tech-negocios",
+    "cat": "Tecnologia",
+    "date": "2026-05-06",
+    "read": 6,
+    "art": "circuito",
+    "pop": 3,
+    "title": "Como a tecnologia está a transformar negócios",
+    "excerpt": "Da automação à decisão baseada em dados: onde está o valor concreto.",
+    "body": [
+      {
+        "t": "p",
+        "v": "A tecnologia mudou menos o que as empresas vendem e mais a velocidade a que aprendem. Quem consegue testar, medir e ajustar em semanas ganha vantagem sobre quem planeia durante trimestres."
+      },
+      {
+        "t": "h",
+        "v": "Automatizar o aborrecido, libertar o humano"
+      },
+      {
+        "t": "p",
+        "v": "O maior retorno continua a estar nas tarefas administrativas repetitivas: conciliações, relatórios, respostas-padrão. Libertar horas qualificadas para trabalho de julgamento tem impacto imediato na margem e na motivação."
+      },
+      {
+        "t": "q",
+        "v": "Antes de comprar uma ferramenta, pergunte que decisão passará a ser tomada de forma diferente."
+      },
+      {
+        "t": "p",
+        "v": "Escolha tecnologia que a sua equipa consegue manter. Sofisticação sem competência interna cria dependência cara de fornecedores."
+      }
+    ]
+  },
+  {
+    "id": "planeamento",
+    "cat": "Estratégia",
+    "date": "2026-05-05",
+    "read": 7,
+    "art": "xadrez",
+    "pop": 5,
+    "title": "Planeamento estratégico na prática: por onde começar?",
+    "excerpt": "Um método simples para transformar intenções em prioridades trimestrais executáveis.",
+    "body": [
+      {
+        "t": "p",
+        "v": "O plano estratégico que ninguém consulta depois de aprovado é um sintoma comum: excesso de análise, escassez de escolhas. Estratégia é decidir o que não vamos fazer."
+      },
+      {
+        "t": "h",
+        "v": "Do diagnóstico às prioridades"
+      },
+      {
+        "t": "p",
+        "v": "Comece por um diagnóstico honesto — onde ganhamos, onde perdemos e porquê. Traduza-o em três prioridades para o ano, no máximo. Depois converta cada prioridade em objetivos trimestrais com responsável, métrica e data."
+      },
+      {
+        "t": "ul",
+        "v": [
+          "Diagnóstico: o que os dados dizem, não o que gostaríamos",
+          "Escolhas: três prioridades, com renúncias explícitas",
+          "Execução: objetivos trimestrais com dono e métrica",
+          "Revisão: uma reunião mensal de trinta minutos por prioridade"
+        ]
+      },
+      {
+        "t": "p",
+        "v": "A diferença entre empresas que executam e as que não executam raramente está na qualidade do plano. Está no ritmo de revisão."
+      }
+    ]
+  },
+  {
+    "id": "cultura-palavras",
+    "cat": "Cultura",
+    "date": "2026-05-04",
+    "read": 4,
+    "art": "circulos",
+    "pop": 4,
+    "title": "Cultura organizacional: mais do que palavras",
+    "excerpt": "Como tornar valores visíveis em processos de contratação, avaliação e promoção.",
+    "body": [
+      {
+        "t": "p",
+        "v": "Valores só se tornam reais quando entram nos mecanismos da empresa: quem contratamos, quem promovemos e quem deixamos sair."
+      },
+      {
+        "t": "h",
+        "v": "Traduza cada valor num comportamento observável"
+      },
+      {
+        "t": "p",
+        "v": "\"Trabalho em equipa\" não se avalia. \"Partilha informação antes de lhe ser pedida\" avalia-se. Escreva, para cada valor, dois comportamentos que se conseguem observar numa entrevista ou numa avaliação de desempenho."
+      },
+      {
+        "t": "q",
+        "v": "Se um valor nunca custou uma decisão à empresa, provavelmente não é um valor."
+      },
+      {
+        "t": "p",
+        "v": "Reveja anualmente se as promoções da empresa contam a história que a cultura declara. Se não contarem, a organização já percebeu — e ajustou o seu comportamento em conformidade."
+      }
+    ]
+  }
+]
