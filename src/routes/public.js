@@ -55,6 +55,32 @@ router.get('/bootstrap.js', (req, res) => {
   res.type('application/javascript; charset=utf-8').set('Cache-Control', 'no-store').send(payload);
 });
 
+router.get('/api/public/categories', (req, res) => {
+  res.set('Cache-Control', 'no-store').json(db.prepare('SELECT name AS k, color AS c, is_top AS top FROM categories ORDER BY is_top DESC, position, name').all().map((x) => ({ k: x.k, c: x.c, top: !!x.top })));
+});
+
+router.get('/api/public/slides', (req, res) => {
+  res.set('Cache-Control', 'no-store').json(db.prepare('SELECT image_url AS img, caption, href FROM slides WHERE active=1 ORDER BY position, id').all());
+});
+
+router.get('/api/public/sponsored', (req, res) => {
+  const row = db.prepare('SELECT brand,title,text,cta,href,image_url AS img FROM sponsored WHERE active=1 ORDER BY id DESC LIMIT 1').get();
+  res.set('Cache-Control', 'no-store').json(row || null);
+});
+
+router.get('/api/public/partners', (req, res) => {
+  res.set('Cache-Control', 'no-store').json(db.prepare('SELECT image_url AS img, name AS alt, href FROM partners WHERE active=1 ORDER BY position, id').all());
+});
+
+router.get('/api/public/ads', (req, res) => {
+  const out = {};
+  // um anúncio activo por posição: o mais recente (ordem ASC, o último sobrescreve)
+  db.prepare('SELECT slot,image_url,image_mobile_url,href,alt FROM ads WHERE active=1 AND image_url IS NOT NULL ORDER BY id ASC').all().forEach((a) => {
+    out[a.slot] = { img: a.image_url, imgM: a.image_mobile_url || '', href: a.href || '', alt: a.alt || '' };
+  });
+  res.set('Cache-Control', 'no-store').json(out);
+});
+
 router.get('/api/public/settings', (req, res) => res.json(settings()));
 router.get('/api/public/articles', (req, res) => res.json(publicArticles()));
 

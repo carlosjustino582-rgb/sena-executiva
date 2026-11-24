@@ -15,6 +15,7 @@ app.disable('x-powered-by');
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 app.use(cookieParser());
+['sobre','servicos','solucoes','contacto','privacidade','termos'].forEach((p) => app.get('/' + p, (req, res) => res.sendFile(path.join(publicDir, 'pages.html'))));
 app.use('/img', express.static(path.join(publicDir, 'img')));
 app.use(express.static(publicDir));
 

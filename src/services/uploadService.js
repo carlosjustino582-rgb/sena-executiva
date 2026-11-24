@@ -52,4 +52,30 @@ async function processUploadedImage(file) {
   return `/img/${path.basename(targetPath)}`;
 }
 
-module.exports = { upload, processUploadedImage };
+// Anúncios: mantém o formato (PNG/GIF/WebP/JPEG) para preservar transparência e animação.
+async function processAdImage(file) {
+  if (!file) return null;
+  const map = { 'image/png': 'png', 'image/jpeg': 'jpeg', 'image/webp': 'webp', 'image/gif': 'gif' };
+  const fmt = map[file.mimetype] || 'jpeg';
+  const targetFilename = `${path.parse(file.filename).name}-ad.${fmt === 'jpeg' ? 'jpg' : fmt}`;
+  const targetPath = path.join(uploadDir, targetFilename);
+  try {
+    await sharp(file.path, { animated: fmt === 'gif' })
+      .resize({ width: 1940, withoutEnlargement: true })
+      .toFormat(fmt)
+      .toFile(targetPath);
+  } catch (error) {
+    try { fs.unlinkSync(targetPath); } catch {}
+    throw error;
+  } finally {
+    try { fs.unlinkSync(file.path); } catch {}
+  }
+  return `/img/${path.basename(targetPath)}`;
+}
+
+function removeUploaded(url) {
+  if (!url || !/^\/img\/[\w.-]+$/.test(url)) return;
+  try { fs.unlinkSync(path.join(uploadDir, path.basename(url))); } catch {}
+}
+
+module.exports = { upload, processUploadedImage, processAdImage, removeUploaded };

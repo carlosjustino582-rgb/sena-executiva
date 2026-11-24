@@ -25,6 +25,15 @@ CREATE TABLE IF NOT EXISTS audit (id INTEGER PRIMARY KEY, user_id INTEGER REFERE
 CREATE TABLE IF NOT EXISTS rate_limits (key TEXT PRIMARY KEY, count INTEGER NOT NULL, reset_at INTEGER NOT NULL);
 CREATE TABLE IF NOT EXISTS password_reset_tokens (id INTEGER PRIMARY KEY, email TEXT NOT NULL, token TEXT NOT NULL UNIQUE, expires_at INTEGER NOT NULL, used INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);
 CREATE TABLE IF NOT EXISTS revoked_tokens (id INTEGER PRIMARY KEY, token_hash TEXT NOT NULL UNIQUE, expires_at INTEGER NOT NULL, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);`);
+db.exec("CREATE TABLE IF NOT EXISTS ads (id INTEGER PRIMARY KEY, name TEXT NOT NULL, slot TEXT NOT NULL, image_url TEXT, image_mobile_url TEXT, href TEXT NOT NULL DEFAULT '', alt TEXT NOT NULL DEFAULT '', active INTEGER NOT NULL DEFAULT 1, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP); CREATE INDEX IF NOT EXISTS idx_ads_slot ON ads(slot,active);");
+db.exec("CREATE TABLE IF NOT EXISTS categories (id INTEGER PRIMARY KEY, name TEXT NOT NULL UNIQUE COLLATE NOCASE, color TEXT NOT NULL DEFAULT '#1B2F6E', is_top INTEGER NOT NULL DEFAULT 0, position INTEGER NOT NULL DEFAULT 100);");
+{
+  const seedCat = db.prepare('INSERT OR IGNORE INTO categories(name,color,is_top,position) VALUES(?,?,1,?)');
+  [['Estratégia', '#3E8F8C'], ['Sena Decisor', '#1B2F6E'], ['Sena Ascensão', '#F5C24B'], ['Entrevistas', '#C0682F'], ['Opinião', '#8B5CF6']].forEach(([n, c], i) => seedCat.run(n, c, i));
+}
+db.exec("CREATE TABLE IF NOT EXISTS slides (id INTEGER PRIMARY KEY, image_url TEXT NOT NULL, caption TEXT NOT NULL DEFAULT '', href TEXT NOT NULL DEFAULT '', position INTEGER NOT NULL DEFAULT 0, active INTEGER NOT NULL DEFAULT 1, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);");
+db.exec("CREATE TABLE IF NOT EXISTS sponsored (id INTEGER PRIMARY KEY, brand TEXT NOT NULL DEFAULT '', title TEXT NOT NULL, text TEXT NOT NULL DEFAULT '', cta TEXT NOT NULL DEFAULT 'Saber mais', href TEXT NOT NULL DEFAULT '', image_url TEXT, active INTEGER NOT NULL DEFAULT 1, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);");
+db.exec("CREATE TABLE IF NOT EXISTS partners (id INTEGER PRIMARY KEY, name TEXT NOT NULL, image_url TEXT NOT NULL, href TEXT NOT NULL DEFAULT '', position INTEGER NOT NULL DEFAULT 0, active INTEGER NOT NULL DEFAULT 1, created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);");
 ensureColumn('articles', 'image_url', 'TEXT DEFAULT NULL');
 const setting=db.prepare('INSERT OR IGNORE INTO settings(key,value) VALUES(?,?)');
 for(const [k,v] of Object.entries({company:'SENA EXECUTIVA',email:'geral@senaexecutiva.ao',phone:'+244 942 620 546',location:'Luanda, Angola',about:'Uma revista executiva dedicada às pessoas, empresas e decisões que movem Angola.'}))setting.run(k,v);
