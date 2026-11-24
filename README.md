@@ -1,26 +1,32 @@
 # SENA EXECUTIVA — Plataforma editorial full-stack
 
-Aplicação funcional sem dependências npm externas, construída com Node.js 22.5+ (servidor HTTP nativo e `node:sqlite`), HTML/CSS/JavaScript. Reproduz o HTML editorial fornecido e acrescenta gestão de artigos, subscrições, contactos, utilizadores e configurações.
+Aplicação full-stack construída com Node.js 22.5+, Express, Prisma e PostgreSQL, com frontend HTML/CSS/JavaScript. Inclui gestão de artigos, subscrições, contactos, utilizadores e configurações.
 
 ## Instalação e arranque
 
 ```bash
 node --version        # versão >= 22.5
-# opcional: exportar variáveis de .env.example (o Node não lê .env automaticamente)
-ADMIN_EMAIL='admin@exemplo.ao' ADMIN_PASSWORD='uma-frase-forte-com-mais-de-12-caracteres' npm run init
+cp .env.example .env
+# Configure DATABASE_URL em .env.
+npm install
+npm run db:generate
+npm run db:push
+npm run db:migrate:sqlite
 npm start
 ```
 
-Abrir `http://127.0.0.1:3000/` (site público) e `http://127.0.0.1:3000/admin` (painel). A base de dados SQLite é criada automaticamente em `data/sena.sqlite`; os 16 artigos de demonstração da referência são importados uma única vez. Para uma instalação editorial vazia, definir `SEED_DEMO=0` antes da primeira execução. **Atenção:** os conteúdos importados são demonstrações, não notícias validadas. Não publicar sem revisão editorial.
+`db:migrate:sqlite` mescla os dados de `data/sena.sqlite` no PostgreSQL, incluindo utilizadores e palavras-passe com hash, e verifica as contagens. Os dados já existentes são preservados; em conflitos por e-mail, slug ou chave, prevalece PostgreSQL. A origem é marcada para impedir uma segunda importação. O ficheiro `.env` é ignorado pelo Git e não deve ser publicado. A aplicação usa PostgreSQL após a migração.
+
+Abrir `http://127.0.0.1:3000/` (site público) e `http://127.0.0.1:3000/admin` (painel). **Atenção:** alguns artigos importados são demonstrações, não notícias validadas. Não publicar sem revisão editorial.
 
 ## Publicação
 
-Configurar uma instância Node.js 22.5+ com armazenamento persistente para a base de dados; definir `NODE_ENV=production`, `HOST=127.0.0.1`, `PORT` e `DB_PATH` absoluto. Colocar Nginx/Caddy à frente com HTTPS, proxy reverso e cabeçalhos de segurança; activar cópias de segurança do ficheiro SQLite usando a API de backup do SQLite, não cópias inconsistentes a quente. Proteger os segredos de administração no gestor de segredos do servidor; não manter a palavra-passe na configuração após criar a conta. Usar um processo supervisionado (systemd/Docker com volume persistente) e monitorização. Para alta carga, migrar para PostgreSQL e introduzir um mecanismo dedicado de sessões e fila de correio.
+Configurar uma instância Node.js 22.5+ e PostgreSQL com backups e armazenamento persistente; definir `NODE_ENV=production`, `HOST=127.0.0.1`, `PORT` e `DATABASE_URL`. Colocar Nginx/Caddy à frente com HTTPS, proxy reverso e cabeçalhos de segurança. Proteger os segredos de administração no gestor de segredos do servidor; não manter a palavra-passe na configuração após criar a conta. Usar um processo supervisionado (systemd/Docker com volume persistente) e monitorização.
 
 ## Funcionalidades
 
 - Website editorial responsivo a partir da referência: pesquisa, categorias, destaques, leitor de artigos, tendências, modo escuro e favoritos locais.
-- Artigos e estados de publicação guardados em SQLite, CRUD administrativo, auditoria e dashboard real.
+- Artigos e estados de publicação guardados em PostgreSQL via Prisma, CRUD administrativo, auditoria e dashboard real.
 - Subscrição de newsletter e formulário de contacto com persistência; consulta no painel; atualização de estado/observações.
 - Login/logout com palavras-passe scrypt + salt aleatório, sessão httpOnly SameSite=Strict, token anti-CSRF, permissões `admin`/`editor`, contas desactiváveis e limite de tentativas por IP e conta, para que um utilizador não bloqueie os restantes atrás do mesmo router/proxy.
 - Configurações institucionais reflectidas nos contactos do site. Os editores podem editar artigos e configurações; só administradores podem gerir utilizadores.
@@ -40,6 +46,8 @@ Pedidos mutáveis autenticados requerem `X-CSRF-Token` obtido de `/api/auth/me` 
 ```bash
 npm test
 ```
+
+Os testes de integração usam um schema temporário e isolado; defina `TEST_DATABASE_URL` para um banco PostgreSQL de testes. Sem essa variável, os testes de integração são ignorados.
 
 ## Limitações conhecidas / trabalho necessário antes do lançamento comercial
 

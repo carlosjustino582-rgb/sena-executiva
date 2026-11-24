@@ -3,14 +3,14 @@
 const db = require('../../db');
 const { verifyToken, hashValue } = require('../utils/security');
 
-function authMiddleware(req, res, next) {
+async function authMiddleware(req, res, next) {
   const token = req.cookies?.sena_jwt || req.cookies?.sena_session || null;
   if (!token) {
     req.user = null;
     return next();
   }
 
-  const revoked = !!db.prepare('SELECT 1 FROM revoked_tokens WHERE token_hash=? AND expires_at>?').get(hashValue(token), Date.now());
+  const revoked = !!await db.prepare('SELECT 1 FROM revoked_tokens WHERE token_hash=? AND expires_at>?').get(hashValue(token), new Date());
   if (revoked) {
     req.user = null;
     return next();

@@ -4,8 +4,9 @@ const express = require('express');
 const db = require('../../db');
 const { authMiddleware, requireAuth, csrfGuard } = require('../middleware/auth');
 const { upload, processUploadedImage, processAdImage, removeUploaded } = require('../services/uploadService');
+const { wrapRouter } = require('../utils/asyncRouter');
 
-const router = express.Router();
+const router = wrapRouter(express.Router());
 
 function validEmail(value) {
   return typeof value === 'string' && value.length <= 254 && /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(value);
@@ -32,8 +33,8 @@ function articleInput(body) {
     category,
     body_json: bodyJson,
     art,
-    featured: body.featured === true || body.featured === 'true' ? 1 : 0,
-    trending: body.trending === true || body.trending === 'true' ? 1 : 0,
+    featured: body.featured === true || body.featured === 'true',
+    trending: body.trending === true || body.trending === 'true',
     status: ['draft', 'published', 'archived'].includes(String(body.status || '')) ? String(body.status) : 'draft',
     image_url: body.image_url || body.image || null,
   };
@@ -41,13 +42,13 @@ function articleInput(body) {
 
 router.use(authMiddleware);
 
-router.get('/api/admin/dashboard', requireAuth, (req, res) => {
+router.get('/api/admin/dashboard', requireAuth, async (req, res) => {
   const dashboard = {
-    articles: db.prepare('SELECT status, COUNT(*) n FROM articles GROUP BY status').all(),
-    contacts: db.prepare('SELECT status,COUNT(*) n FROM contacts GROUP BY status').all(),
-    subscribers: db.prepare('SELECT COUNT(*) n FROM subscribers').get().n,
-    users: db.prepare('SELECT COUNT(*) n FROM users').get().n,
-    recent: db.prepare('SELECT id,action,entity,created_at FROM audit ORDER BY id DESC LIMIT 12').all(),
+    articles: await db.prepare('SELECT status, COUNT(*) n FROM articles GROUP BY status').all(),
+    contacts: await db.prepare('SELECT status,COUNT(*) n FROM contacts GROUP BY status').all(),
+    subscribers: (await db.prepare('SELECT COUNT(*) n FROM subscribers').get()).n,
+    users: (await db.prepare('SELECT COUNT(*) n FROM users').get()).n,
+    recent: await db.prepare('SELECT id,action,entity,created_at FROM audit ORDER BY id DESC LIMIT 12').all(),
   };
   return res.json(dashboard);
 });
@@ -60,52 +61,50 @@ function categoryInput(body) {
   return { name, color };
 }
 
-router.get('/api/admin/categories', requireAuth, (req, res) => {
-  return res.json(db.prepare('SELECT c.*, (SELECT COUNT(*) FROM articles a WHERE a.category=c.name) AS articles FROM categories c ORDER BY is_top DESC, position, name').all());
+router.get('/api/admin/categories', requireAuth, async (req, res) => {
+  return res.json(await db.prepare('SELECT c.*, (SELECT COUNT(*) FROM articles a WHERE a.category=c.name) AS articles FROM categories c ORDER BY is_top DESC, position, name').all());
 });
 
-router.post('/api/admin/categories', requireAuth, csrfGuard, (req, res) => {
+router.post('/api/admin/categories', requireAuth, csrfGuard, async (req, res) => {
   try {
     const v = categoryInput(req.body || {});
-    if (db.prepare('SELECT 1 FROM categories WHERE name=?').get(v.name)) throw Object.assign(new Error('Já existe uma categoria com esse nome.'), { status: 409 });
-    const row = db.prepare('INSERT INTO categories(name,color,is_top,position) VALUES(?,?,0,100)').run(v.name, v.color);
+    if (await db.prepare('SELECT 1 FROM categories WHERE lower(name)=lower(?)').get(v.name)) throw Object.assign(new Error('Já existe uma categoria com esse nome.'), { status: 409 });
+    const row = await db.prepare('INSERT INTO categories(name,color,is_top,position) VALUES(?,?,FALSE,100)').run(v.name, v.color);
     return res.status(201).json({ id: Number(row.lastInsertRowid) });
   } catch (error) {
     return res.status(error.status || 500).json({ error: error.message || 'Erro interno do servidor.' });
   }
 });
 
-router.put('/api/admin/categories/:id', requireAuth, csrfGuard, (req, res) => {
+router.put('/api/admin/categories/:id', requireAuth, csrfGuard, async (req, res) => {
   try {
     const id = Number(req.params.id);
-    const cur = db.prepare('SELECT * FROM categories WHERE id=?').get(id);
+    const cur = await db.prepare('SELECT * FROM categories WHERE id=?').get(id);
     if (!cur) throw Object.assign(new Error('Categoria não encontrada.'), { status: 404 });
     const v = categoryInput(req.body || {});
     // as categorias do menu principal mantêm o nome (o menu depende dele)
     const name = cur.is_top ? cur.name : v.name;
-    if (name.toLowerCase() !== cur.name.toLowerCase() && db.prepare('SELECT 1 FROM categories WHERE name=? AND id<>?').get(name, id)) {
+    if (name.toLowerCase() !== cur.name.toLowerCase() && await db.prepare('SELECT 1 FROM categories WHERE lower(name)=lower(?) AND id<>?').get(name, id)) {
       throw Object.assign(new Error('Já existe uma categoria com esse nome.'), { status: 409 });
     }
-    db.exec('BEGIN');
-    try {
-      db.prepare('UPDATE categories SET name=?,color=? WHERE id=?').run(name, v.color, id);
-      if (name !== cur.name) db.prepare('UPDATE articles SET category=? WHERE category=?').run(name, cur.name);
-      db.exec('COMMIT');
-    } catch (e) { db.exec('ROLLBACK'); throw e; }
+    await db.transaction(async (tx) => {
+      await tx.prepare('UPDATE categories SET name=?,color=? WHERE id=?').run(name, v.color, id);
+      if (name !== cur.name) await tx.prepare('UPDATE articles SET category=? WHERE category=?').run(name, cur.name);
+    });
     return res.json({ ok: true });
   } catch (error) {
     return res.status(error.status || 500).json({ error: error.message || 'Erro interno do servidor.' });
   }
 });
 
-router.delete('/api/admin/categories/:id', requireAuth, csrfGuard, (req, res) => {
+router.delete('/api/admin/categories/:id', requireAuth, csrfGuard, async (req, res) => {
   const id = Number(req.params.id);
-  const cur = db.prepare('SELECT * FROM categories WHERE id=?').get(id);
+  const cur = await db.prepare('SELECT * FROM categories WHERE id=?').get(id);
   if (!cur) return res.status(404).json({ error: 'Categoria não encontrada.' });
   if (cur.is_top) return res.status(400).json({ error: 'As categorias do menu principal não podem ser eliminadas.' });
-  const n = db.prepare('SELECT COUNT(*) n FROM articles WHERE category=?').get(cur.name).n;
+  const n = (await db.prepare('SELECT COUNT(*) n FROM articles WHERE category=?').get(cur.name)).n;
   if (n > 0) return res.status(409).json({ error: `Esta categoria tem ${n} artigo(s). Mude-os de categoria antes de a eliminar.` });
-  db.prepare('DELETE FROM categories WHERE id=?').run(id);
+  await db.prepare('DELETE FROM categories WHERE id=?').run(id);
   return res.json({ ok: true });
 });
 
@@ -115,18 +114,18 @@ function slideInput(body) {
   if (href && (!/^(https?:\/\/|mailto:)/i.test(href) || href.length > 500)) {
     throw Object.assign(new Error('O link deve começar por http://, https:// ou mailto:.'), { status: 400 });
   }
-  return { caption, href, active: body.active === true || body.active === 'true' || body.active === 'on' ? 1 : 0 };
+  return { caption, href, active: body.active === true || body.active === 'true' || body.active === 'on' };
 }
 
-router.get('/api/admin/slides', requireAuth, (req, res) => res.json(db.prepare('SELECT * FROM slides ORDER BY position, id').all()));
+router.get('/api/admin/slides', requireAuth, async (req, res) => res.json(await db.prepare('SELECT * FROM slides ORDER BY position, id').all()));
 
 router.post('/api/admin/slides', requireAuth, csrfGuard, upload.single('image'), async (req, res) => {
   try {
     const v = slideInput(req.body);
     if (!req.file) throw Object.assign(new Error('Envie a imagem.'), { status: 400 });
     const imageUrl = await processAdImage(req.file);
-    const pos = db.prepare('SELECT COALESCE(MAX(position),0)+1 AS p FROM slides').get().p;
-    const row = db.prepare('INSERT INTO slides(image_url,caption,href,position,active) VALUES(?,?,?,?,?)').run(imageUrl, v.caption, v.href, pos, v.active);
+    const pos = (await db.prepare('SELECT COALESCE(MAX(position),0)+1 AS p FROM slides').get()).p;
+    const row = await db.prepare('INSERT INTO slides(image_url,caption,href,position,active) VALUES(?,?,?,?,?)').run(imageUrl, v.caption, v.href, pos, v.active);
     return res.status(201).json({ id: Number(row.lastInsertRowid) });
   } catch (error) {
     return res.status(error.status || 500).json({ error: error.message || 'Erro interno do servidor.' });
@@ -136,38 +135,38 @@ router.post('/api/admin/slides', requireAuth, csrfGuard, upload.single('image'),
 router.put('/api/admin/slides/:id', requireAuth, csrfGuard, upload.single('image'), async (req, res) => {
   try {
     const id = Number(req.params.id);
-    const cur = db.prepare('SELECT * FROM slides WHERE id=?').get(id);
+    const cur = await db.prepare('SELECT * FROM slides WHERE id=?').get(id);
     if (!cur) throw Object.assign(new Error('Slide não encontrado.'), { status: 404 });
     const v = slideInput(req.body);
     let imageUrl = cur.image_url;
     if (req.file) { imageUrl = await processAdImage(req.file); removeUploaded(cur.image_url); }
-    db.prepare('UPDATE slides SET image_url=?,caption=?,href=?,active=?,updated_at=CURRENT_TIMESTAMP WHERE id=?').run(imageUrl, v.caption, v.href, v.active, id);
+    await db.prepare('UPDATE slides SET image_url=?,caption=?,href=?,active=?,updated_at=CURRENT_TIMESTAMP WHERE id=?').run(imageUrl, v.caption, v.href, v.active, id);
     return res.json({ ok: true });
   } catch (error) {
     return res.status(error.status || 500).json({ error: error.message || 'Erro interno do servidor.' });
   }
 });
 
-router.post('/api/admin/slides/:id/move', requireAuth, csrfGuard, (req, res) => {
+router.post('/api/admin/slides/:id/move', requireAuth, csrfGuard, async (req, res) => {
   const id = Number(req.params.id);
   const dir = req.body?.dir === 'up' ? -1 : req.body?.dir === 'down' ? 1 : 0;
-  const rows = db.prepare('SELECT id FROM slides ORDER BY position, id').all().map((r) => r.id);
+  const rows = (await db.prepare('SELECT id FROM slides ORDER BY position, id').all()).map((r) => r.id);
   const i = rows.indexOf(id);
   if (i < 0 || !dir) return res.status(400).json({ error: 'Pedido inválido.' });
   const j = i + dir;
   if (j >= 0 && j < rows.length) {
     [rows[i], rows[j]] = [rows[j], rows[i]];
     const up = db.prepare('UPDATE slides SET position=? WHERE id=?');
-    rows.forEach((rid, k) => up.run(k + 1, rid));
+    for (const [k, rid] of rows.entries()) await up.run(k + 1, rid);
   }
   return res.json({ ok: true });
 });
 
-router.delete('/api/admin/slides/:id', requireAuth, csrfGuard, (req, res) => {
+router.delete('/api/admin/slides/:id', requireAuth, csrfGuard, async (req, res) => {
   const id = Number(req.params.id);
-  const cur = db.prepare('SELECT * FROM slides WHERE id=?').get(id);
+  const cur = await db.prepare('SELECT * FROM slides WHERE id=?').get(id);
   if (!cur) return res.status(404).json({ error: 'Slide não encontrado.' });
-  db.prepare('DELETE FROM slides WHERE id=?').run(id);
+  await db.prepare('DELETE FROM slides WHERE id=?').run(id);
   removeUploaded(cur.image_url);
   return res.json({ ok: true });
 });
@@ -182,16 +181,16 @@ function sponsoredInput(body) {
   if (!href || !/^(https?:\/\/|mailto:)/i.test(href) || href.length > 500) {
     throw Object.assign(new Error('Indique um link de destino começado por http://, https:// ou mailto:.'), { status: 400 });
   }
-  return { brand, title, text, cta, href, active: body.active === true || body.active === 'true' || body.active === 'on' ? 1 : 0 };
+  return { brand, title, text, cta, href, active: body.active === true || body.active === 'true' || body.active === 'on' };
 }
 
-router.get('/api/admin/sponsored', requireAuth, (req, res) => res.json(db.prepare('SELECT * FROM sponsored ORDER BY active DESC, id DESC').all()));
+router.get('/api/admin/sponsored', requireAuth, async (req, res) => res.json(await db.prepare('SELECT * FROM sponsored ORDER BY active DESC, id DESC').all()));
 
 router.post('/api/admin/sponsored', requireAuth, csrfGuard, upload.single('image'), async (req, res) => {
   try {
     const v = sponsoredInput(req.body);
     const imageUrl = req.file ? await processAdImage(req.file) : null;
-    const row = db.prepare('INSERT INTO sponsored(brand,title,text,cta,href,image_url,active) VALUES(?,?,?,?,?,?,?)').run(v.brand, v.title, v.text, v.cta, v.href, imageUrl, v.active);
+    const row = await db.prepare('INSERT INTO sponsored(brand,title,text,cta,href,image_url,active) VALUES(?,?,?,?,?,?,?)').run(v.brand, v.title, v.text, v.cta, v.href, imageUrl, v.active);
     return res.status(201).json({ id: Number(row.lastInsertRowid) });
   } catch (error) {
     return res.status(error.status || 500).json({ error: error.message || 'Erro interno do servidor.' });
@@ -201,24 +200,24 @@ router.post('/api/admin/sponsored', requireAuth, csrfGuard, upload.single('image
 router.put('/api/admin/sponsored/:id', requireAuth, csrfGuard, upload.single('image'), async (req, res) => {
   try {
     const id = Number(req.params.id);
-    const cur = db.prepare('SELECT * FROM sponsored WHERE id=?').get(id);
+    const cur = await db.prepare('SELECT * FROM sponsored WHERE id=?').get(id);
     if (!cur) throw Object.assign(new Error('Conteúdo não encontrado.'), { status: 404 });
     const v = sponsoredInput(req.body);
     let imageUrl = cur.image_url;
     if (req.file) { imageUrl = await processAdImage(req.file); removeUploaded(cur.image_url); }
     else if (req.body.remove_image === 'true') { removeUploaded(cur.image_url); imageUrl = null; }
-    db.prepare('UPDATE sponsored SET brand=?,title=?,text=?,cta=?,href=?,image_url=?,active=?,updated_at=CURRENT_TIMESTAMP WHERE id=?').run(v.brand, v.title, v.text, v.cta, v.href, imageUrl, v.active, id);
+    await db.prepare('UPDATE sponsored SET brand=?,title=?,text=?,cta=?,href=?,image_url=?,active=?,updated_at=CURRENT_TIMESTAMP WHERE id=?').run(v.brand, v.title, v.text, v.cta, v.href, imageUrl, v.active, id);
     return res.json({ ok: true });
   } catch (error) {
     return res.status(error.status || 500).json({ error: error.message || 'Erro interno do servidor.' });
   }
 });
 
-router.delete('/api/admin/sponsored/:id', requireAuth, csrfGuard, (req, res) => {
+router.delete('/api/admin/sponsored/:id', requireAuth, csrfGuard, async (req, res) => {
   const id = Number(req.params.id);
-  const cur = db.prepare('SELECT * FROM sponsored WHERE id=?').get(id);
+  const cur = await db.prepare('SELECT * FROM sponsored WHERE id=?').get(id);
   if (!cur) return res.status(404).json({ error: 'Conteúdo não encontrado.' });
-  db.prepare('DELETE FROM sponsored WHERE id=?').run(id);
+  await db.prepare('DELETE FROM sponsored WHERE id=?').run(id);
   removeUploaded(cur.image_url);
   return res.json({ ok: true });
 });
@@ -230,18 +229,18 @@ function partnerInput(body) {
   if (href && (!/^(https?:\/\/|mailto:)/i.test(href) || href.length > 500)) {
     throw Object.assign(new Error('O link deve começar por http://, https:// ou mailto:.'), { status: 400 });
   }
-  return { name, href, active: body.active === true || body.active === 'true' || body.active === 'on' ? 1 : 0 };
+  return { name, href, active: body.active === true || body.active === 'true' || body.active === 'on' };
 }
 
-router.get('/api/admin/partners', requireAuth, (req, res) => res.json(db.prepare('SELECT * FROM partners ORDER BY position, id').all()));
+router.get('/api/admin/partners', requireAuth, async (req, res) => res.json(await db.prepare('SELECT * FROM partners ORDER BY position, id').all()));
 
 router.post('/api/admin/partners', requireAuth, csrfGuard, upload.single('image'), async (req, res) => {
   try {
     const v = partnerInput(req.body);
     if (!req.file) throw Object.assign(new Error('Envie o logótipo do parceiro.'), { status: 400 });
     const imageUrl = await processAdImage(req.file);
-    const pos = db.prepare('SELECT COALESCE(MAX(position),0)+1 AS p FROM partners').get().p;
-    const row = db.prepare('INSERT INTO partners(name,image_url,href,position,active) VALUES(?,?,?,?,?)').run(v.name, imageUrl, v.href, pos, v.active);
+    const pos = (await db.prepare('SELECT COALESCE(MAX(position),0)+1 AS p FROM partners').get()).p;
+    const row = await db.prepare('INSERT INTO partners(name,image_url,href,position,active) VALUES(?,?,?,?,?)').run(v.name, imageUrl, v.href, pos, v.active);
     return res.status(201).json({ id: Number(row.lastInsertRowid) });
   } catch (error) {
     return res.status(error.status || 500).json({ error: error.message || 'Erro interno do servidor.' });
@@ -251,44 +250,44 @@ router.post('/api/admin/partners', requireAuth, csrfGuard, upload.single('image'
 router.put('/api/admin/partners/:id', requireAuth, csrfGuard, upload.single('image'), async (req, res) => {
   try {
     const id = Number(req.params.id);
-    const cur = db.prepare('SELECT * FROM partners WHERE id=?').get(id);
+    const cur = await db.prepare('SELECT * FROM partners WHERE id=?').get(id);
     if (!cur) throw Object.assign(new Error('Parceiro não encontrado.'), { status: 404 });
     const v = partnerInput(req.body);
     let imageUrl = cur.image_url;
     if (req.file) { imageUrl = await processAdImage(req.file); removeUploaded(cur.image_url); }
-    db.prepare('UPDATE partners SET name=?,image_url=?,href=?,active=?,updated_at=CURRENT_TIMESTAMP WHERE id=?').run(v.name, imageUrl, v.href, v.active, id);
+    await db.prepare('UPDATE partners SET name=?,image_url=?,href=?,active=?,updated_at=CURRENT_TIMESTAMP WHERE id=?').run(v.name, imageUrl, v.href, v.active, id);
     return res.json({ ok: true });
   } catch (error) {
     return res.status(error.status || 500).json({ error: error.message || 'Erro interno do servidor.' });
   }
 });
 
-router.post('/api/admin/partners/:id/move', requireAuth, csrfGuard, (req, res) => {
+router.post('/api/admin/partners/:id/move', requireAuth, csrfGuard, async (req, res) => {
   const id = Number(req.params.id);
   const dir = req.body?.dir === 'up' ? -1 : req.body?.dir === 'down' ? 1 : 0;
-  const rows = db.prepare('SELECT id FROM partners ORDER BY position, id').all().map((r) => r.id);
+  const rows = (await db.prepare('SELECT id FROM partners ORDER BY position, id').all()).map((r) => r.id);
   const i = rows.indexOf(id);
   if (i < 0 || !dir) return res.status(400).json({ error: 'Pedido inválido.' });
   const j = i + dir;
   if (j >= 0 && j < rows.length) {
     [rows[i], rows[j]] = [rows[j], rows[i]];
     const up = db.prepare('UPDATE partners SET position=? WHERE id=?');
-    rows.forEach((rid, k) => up.run(k + 1, rid));
+    for (const [k, rid] of rows.entries()) await up.run(k + 1, rid);
   }
   return res.json({ ok: true });
 });
 
-router.delete('/api/admin/partners/:id', requireAuth, csrfGuard, (req, res) => {
+router.delete('/api/admin/partners/:id', requireAuth, csrfGuard, async (req, res) => {
   const id = Number(req.params.id);
-  const cur = db.prepare('SELECT * FROM partners WHERE id=?').get(id);
+  const cur = await db.prepare('SELECT * FROM partners WHERE id=?').get(id);
   if (!cur) return res.status(404).json({ error: 'Parceiro não encontrado.' });
-  db.prepare('DELETE FROM partners WHERE id=?').run(id);
+  await db.prepare('DELETE FROM partners WHERE id=?').run(id);
   removeUploaded(cur.image_url);
   return res.json({ ok: true });
 });
 
-router.get('/api/admin/articles', requireAuth, (req, res) => {
-  return res.json(db.prepare('SELECT * FROM articles ORDER BY updated_at DESC,id DESC').all());
+router.get('/api/admin/articles', requireAuth, async (req, res) => {
+  return res.json(await db.prepare('SELECT * FROM articles ORDER BY updated_at DESC,id DESC').all());
 });
 
 router.post('/api/admin/articles', requireAuth, csrfGuard, upload.single('image'), async (req, res) => {
@@ -296,7 +295,7 @@ router.post('/api/admin/articles', requireAuth, csrfGuard, upload.single('image'
     const values = articleInput(req.body || {});
     const imageUrl = req.file ? await processUploadedImage(req.file) : values.image_url || null;
     const slug = slugify(req.body.slug || values.title) || 'artigo';
-    const row = db.prepare('INSERT INTO articles(slug,title,excerpt,category,body_json,art,image_url,featured,trending,status,published_at) VALUES(?,?,?,?,?,?,?,?,?,?,?)').run(
+    const row = await db.prepare('INSERT INTO articles(slug,title,excerpt,category,body_json,art,image_url,featured,trending,status,published_at) VALUES(?,?,?,?,?,?,?,?,?,?,?)').run(
       slug,
       values.title,
       values.excerpt,
@@ -318,11 +317,11 @@ router.post('/api/admin/articles', requireAuth, csrfGuard, upload.single('image'
 router.put('/api/admin/articles/:id', requireAuth, csrfGuard, upload.single('image'), async (req, res) => {
   try {
     const id = Number(req.params.id);
-    const current = db.prepare('SELECT * FROM articles WHERE id=?').get(id);
+    const current = await db.prepare('SELECT * FROM articles WHERE id=?').get(id);
     if (!current) return res.status(404).json({ error: 'Artigo não encontrado.' });
     const values = articleInput(req.body || {});
     const imageUrl = req.file ? await processUploadedImage(req.file) : values.image_url || current.image_url || null;
-    db.prepare('UPDATE articles SET title=?,excerpt=?,category=?,body_json=?,art=?,image_url=?,featured=?,trending=?,status=?,published_at=?,updated_at=CURRENT_TIMESTAMP WHERE id=?').run(
+    await db.prepare('UPDATE articles SET title=?,excerpt=?,category=?,body_json=?,art=?,image_url=?,featured=?,trending=?,status=?,published_at=?,updated_at=CURRENT_TIMESTAMP WHERE id=?').run(
       values.title,
       values.excerpt,
       values.category,
@@ -341,11 +340,11 @@ router.put('/api/admin/articles/:id', requireAuth, csrfGuard, upload.single('ima
   }
 });
 
-router.delete('/api/admin/articles/:id', requireAuth, csrfGuard, (req, res) => {
+router.delete('/api/admin/articles/:id', requireAuth, csrfGuard, async (req, res) => {
   const id = Number(req.params.id);
-  const row = db.prepare('SELECT id FROM articles WHERE id=?').get(id);
+  const row = await db.prepare('SELECT id FROM articles WHERE id=?').get(id);
   if (!row) return res.status(404).json({ error: 'Artigo não encontrado.' });
-  db.prepare('DELETE FROM articles WHERE id=?').run(id);
+  await db.prepare('DELETE FROM articles WHERE id=?').run(id);
   return res.json({ ok: true });
 });
 
@@ -370,12 +369,12 @@ function adInput(body) {
   if (href && (!/^(https?:\/\/|mailto:)/i.test(href) || href.length > 500)) {
     throw Object.assign(new Error('O link deve começar por http://, https:// ou mailto:.'), { status: 400 });
   }
-  return { name, slot, href, alt, active: body.active === true || body.active === 'true' || body.active === 'on' ? 1 : 0 };
+  return { name, slot, href, alt, active: body.active === true || body.active === 'true' || body.active === 'on' };
 }
 
 router.get('/api/admin/ad-slots', requireAuth, (req, res) => res.json(AD_SLOTS));
 
-router.get('/api/admin/ads', requireAuth, (req, res) => res.json(db.prepare('SELECT * FROM ads ORDER BY slot, active DESC, id DESC').all()));
+router.get('/api/admin/ads', requireAuth, async (req, res) => res.json(await db.prepare('SELECT * FROM ads ORDER BY slot, active DESC, id DESC').all()));
 
 router.post('/api/admin/ads', requireAuth, csrfGuard, adUpload, async (req, res) => {
   try {
@@ -384,7 +383,7 @@ router.post('/api/admin/ads', requireAuth, csrfGuard, adUpload, async (req, res)
     if (!img) throw Object.assign(new Error('Envie a imagem do anúncio.'), { status: 400 });
     const imageUrl = await processAdImage(img);
     const mobileUrl = await processAdImage(req.files?.image_mobile?.[0]);
-    const row = db.prepare('INSERT INTO ads(name,slot,image_url,image_mobile_url,href,alt,active) VALUES(?,?,?,?,?,?,?)').run(v.name, v.slot, imageUrl, mobileUrl, v.href, v.alt, v.active);
+    const row = await db.prepare('INSERT INTO ads(name,slot,image_url,image_mobile_url,href,alt,active) VALUES(?,?,?,?,?,?,?)').run(v.name, v.slot, imageUrl, mobileUrl, v.href, v.alt, v.active);
     return res.status(201).json({ id: Number(row.lastInsertRowid) });
   } catch (error) {
     return res.status(error.status || 500).json({ error: error.message || 'Erro interno do servidor.' });
@@ -394,7 +393,7 @@ router.post('/api/admin/ads', requireAuth, csrfGuard, adUpload, async (req, res)
 router.put('/api/admin/ads/:id', requireAuth, csrfGuard, adUpload, async (req, res) => {
   try {
     const id = Number(req.params.id);
-    const current = db.prepare('SELECT * FROM ads WHERE id=?').get(id);
+    const current = await db.prepare('SELECT * FROM ads WHERE id=?').get(id);
     if (!current) throw Object.assign(new Error('Anúncio não encontrado.'), { status: 404 });
     const v = adInput(req.body);
     let imageUrl = current.image_url;
@@ -402,40 +401,40 @@ router.put('/api/admin/ads/:id', requireAuth, csrfGuard, adUpload, async (req, r
     if (req.files?.image?.[0]) { imageUrl = await processAdImage(req.files.image[0]); removeUploaded(current.image_url); }
     if (req.files?.image_mobile?.[0]) { mobileUrl = await processAdImage(req.files.image_mobile[0]); removeUploaded(current.image_mobile_url); }
     else if (req.body.remove_mobile === 'true') { removeUploaded(current.image_mobile_url); mobileUrl = null; }
-    db.prepare('UPDATE ads SET name=?,slot=?,image_url=?,image_mobile_url=?,href=?,alt=?,active=?,updated_at=CURRENT_TIMESTAMP WHERE id=?').run(v.name, v.slot, imageUrl, mobileUrl, v.href, v.alt, v.active, id);
+    await db.prepare('UPDATE ads SET name=?,slot=?,image_url=?,image_mobile_url=?,href=?,alt=?,active=?,updated_at=CURRENT_TIMESTAMP WHERE id=?').run(v.name, v.slot, imageUrl, mobileUrl, v.href, v.alt, v.active, id);
     return res.json({ ok: true });
   } catch (error) {
     return res.status(error.status || 500).json({ error: error.message || 'Erro interno do servidor.' });
   }
 });
 
-router.delete('/api/admin/ads/:id', requireAuth, csrfGuard, (req, res) => {
+router.delete('/api/admin/ads/:id', requireAuth, csrfGuard, async (req, res) => {
   const id = Number(req.params.id);
-  const row = db.prepare('SELECT * FROM ads WHERE id=?').get(id);
+  const row = await db.prepare('SELECT * FROM ads WHERE id=?').get(id);
   if (!row) return res.status(404).json({ error: 'Anúncio não encontrado.' });
-  db.prepare('DELETE FROM ads WHERE id=?').run(id);
+  await db.prepare('DELETE FROM ads WHERE id=?').run(id);
   removeUploaded(row.image_url);
   removeUploaded(row.image_mobile_url);
   return res.json({ ok: true });
 });
 
-router.get('/api/admin/contacts', requireAuth, (req, res) => res.json(db.prepare('SELECT * FROM contacts ORDER BY id DESC').all()));
+router.get('/api/admin/contacts', requireAuth, async (req, res) => res.json(await db.prepare('SELECT * FROM contacts ORDER BY id DESC').all()));
 
-router.patch('/api/admin/contacts/:id', requireAuth, csrfGuard, (req, res) => {
+router.patch('/api/admin/contacts/:id', requireAuth, csrfGuard, async (req, res) => {
   const id = Number(req.params.id);
   const status = String(req.body?.status || '');
   const notes = String(req.body?.notes || '');
   if (!['new', 'in_progress', 'resolved'].includes(status) || notes.length > 2000) {
     return res.status(400).json({ error: 'Estado ou observações inválidos.' });
   }
-  db.prepare('UPDATE contacts SET status=?,notes=? WHERE id=?').run(status, notes, id);
+  await db.prepare('UPDATE contacts SET status=?,notes=? WHERE id=?').run(status, notes, id);
   return res.json({ ok: true });
 });
 
-router.get('/api/admin/subscribers', requireAuth, (req, res) => res.json(db.prepare('SELECT * FROM subscribers ORDER BY id DESC').all()));
-router.get('/api/admin/settings', requireAuth, (req, res) => res.json(Object.fromEntries(db.prepare('SELECT key,value FROM settings').all().map((x) => [x.key, x.value]))));
+router.get('/api/admin/subscribers', requireAuth, async (req, res) => res.json(await db.prepare('SELECT * FROM subscribers ORDER BY id DESC').all()));
+router.get('/api/admin/settings', requireAuth, async (req, res) => res.json(Object.fromEntries((await db.prepare('SELECT key,value FROM settings').all()).map((x) => [x.key, x.value]))));
 
-router.put('/api/admin/settings', requireAuth, csrfGuard, (req, res) => {
+router.put('/api/admin/settings', requireAuth, csrfGuard, async (req, res) => {
   const allowed = ['company', 'email', 'phone', 'location', 'about'];
   const payload = req.body || {};
   for (const key of Object.keys(payload)) {
@@ -444,16 +443,16 @@ router.put('/api/admin/settings', requireAuth, csrfGuard, (req, res) => {
     }
   }
   const insert = db.prepare('INSERT INTO settings(key,value) VALUES(?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value');
-  for (const [key, value] of Object.entries(payload)) insert.run(key, value);
+  for (const [key, value] of Object.entries(payload)) await insert.run(key, value);
   return res.json({ ok: true });
 });
 
-router.get('/api/admin/users', requireAuth, (req, res) => {
+router.get('/api/admin/users', requireAuth, async (req, res) => {
   if (req.user.role !== 'admin') return res.status(403).json({ error: 'Permissão insuficiente.' });
-  return res.json(db.prepare('SELECT id,name,email,role,active,created_at FROM users ORDER BY id DESC').all());
+  return res.json(await db.prepare('SELECT id,name,email,role,active,created_at FROM users ORDER BY id DESC').all());
 });
 
-router.post('/api/admin/users', requireAuth, csrfGuard, (req, res) => {
+router.post('/api/admin/users', requireAuth, csrfGuard, async (req, res) => {
   if (req.user.role !== 'admin') return res.status(403).json({ error: 'Permissão insuficiente.' });
   const name = String(req.body?.name || '').trim();
   const email = String(req.body?.email || '').trim().toLowerCase();
@@ -462,13 +461,16 @@ router.post('/api/admin/users', requireAuth, csrfGuard, (req, res) => {
   if (!name || !validEmail(email) || !['admin', 'editor'].includes(role) || password.length < 12) {
     return res.status(400).json({ error: 'Utilizador inválido; palavra-passe mínima de 12 caracteres.' });
   }
+  if (await db.prepare('SELECT 1 FROM users WHERE lower(email)=lower(?)').get(email)) {
+    return res.status(409).json({ error: 'Já existe um utilizador com esse e-mail.' });
+  }
   const bcrypt = require('bcrypt');
   const passwordHash = bcrypt.hashSync(password, 12);
-  const row = db.prepare('INSERT INTO users(name,email,password_hash,role) VALUES(?,?,?,?)').run(name, email, passwordHash, role);
+  const row = await db.prepare('INSERT INTO users(name,email,password_hash,role) VALUES(?,?,?,?)').run(name, email, passwordHash, role);
   return res.status(201).json({ id: row.lastInsertRowid });
 });
 
-router.patch('/api/admin/users/:id', requireAuth, csrfGuard, (req, res) => {
+router.patch('/api/admin/users/:id', requireAuth, csrfGuard, async (req, res) => {
   if (req.user.role !== 'admin') return res.status(403).json({ error: 'Permissão insuficiente.' });
   const id = Number(req.params.id);
   const role = String(req.body?.role || 'editor');
@@ -476,7 +478,7 @@ router.patch('/api/admin/users/:id', requireAuth, csrfGuard, (req, res) => {
   if (!['admin', 'editor'].includes(role) || typeof req.body?.active !== 'boolean') {
     return res.status(400).json({ error: 'Permissões inválidas.' });
   }
-  db.prepare('UPDATE users SET role=?,active=? WHERE id=?').run(role, active ? 1 : 0, id);
+  await db.prepare('UPDATE users SET role=?,active=? WHERE id=?').run(role, active, id);
   return res.json({ ok: true });
 });
 
