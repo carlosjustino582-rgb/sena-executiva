@@ -42,6 +42,10 @@ app.use((err, req, res, next) => {
   return next();
 });
 
-app.use((req, res) => res.status(404).json({ error: 'Rota inexistente.' }));
+app.use((req, res) => 
+  res.status(404).
+sendFile(path.join(publicDir, '404.html'))
+
+);
 
 module.exports = app;
